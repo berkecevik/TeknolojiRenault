@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:teknolojirenault/Stokkontrol.dart';
+import 'package:teknolojirenault/CheckStock.dart';
 import 'package:teknolojirenault/WelcomePage.dart';
 import 'package:teknolojirenault/main.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';

@@ -1,6 +1,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:teknolojirenault/main.dart';
+const TextStyle _textStyle = TextStyle(
+  fontSize: 40,
+  fontWeight: FontWeight.bold,
+  letterSpacing: 2,
+  fontStyle: FontStyle.italic,
+);
 class Stokkontrol extends StatefulWidget{
   const Stokkontrol ({Key? key}) : super (key: key);
   @override
@@ -28,6 +34,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  List<Widget> pages = const [
+  Text('eco', style: _textStyle),
+      Text('home', style: _textStyle),
+  Text('person', style: _textStyle),
+  Text('video', style: _textStyle),];
   final List<Map<String, dynamic>> _allUsers = [
     {"id": 1, "name": "Kış Lastiği", "age": 29},
     {"id": 2, "name": "Hava Filtresi", "age": 40},
@@ -123,6 +135,38 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+
+     /* bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (int newIndex) {
+          setState(() {
+            _currentIndex = newIndex;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            selectedIcon: Icon(Icons.eco),
+            icon: Icon(Icons.eco_outlined),
+            label: 'eco',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.home),
+            icon: Icon(Icons.home_outlined),
+            label: 'home',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.person),
+            icon: Icon(Icons.person_outlined),
+            label: 'person',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.video_camera_back),
+            icon: Icon(Icons.video_camera_back_outlined),
+            label: 'video',
+          ),
+        ],
+      ),*/
+
 
     );
   }

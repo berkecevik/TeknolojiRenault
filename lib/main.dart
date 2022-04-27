@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:teknolojirenault/Login.dart';
 import 'package:teknolojirenault/Settings.dart';
-import 'package:teknolojirenault/Stokkontrol.dart';
-import 'package:teknolojirenault/Stokekle.dart';
-import 'package:teknolojirenault/Randevular.dart';
+import 'package:teknolojirenault/CheckStock.dart';
+import 'package:teknolojirenault/AddStock.dart';
+import 'package:teknolojirenault/Appointments.dart';
 import 'package:teknolojirenault/Barkod.dart';
 void main() {
   runApp(const MyApp());
