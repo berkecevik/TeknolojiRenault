@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:teknolojirenault/Login.dart';
 import 'package:teknolojirenault/Settings.dart';
 import 'package:teknolojirenault/CheckStock.dart';
-import 'package:teknolojirenault/AddStock.dart';
+import 'package:teknolojirenault/Contact.dart';
 import 'package:teknolojirenault/Appointments.dart';
 import 'package:teknolojirenault/Barkod.dart';
 void main() {
@@ -69,14 +69,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
               onPressed: ()
                 {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Stokkontrol()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>HomePage()));
                 }
             ),
             ElevatedButton(
-                child: SizedBox(child:Text('Stok Ekle',textAlign: TextAlign.center,),width:300.0 ,height:20.0,),
+                child: SizedBox(child:Text('İletişim',textAlign: TextAlign.center,),width:300.0 ,height:20.0,),
                 onPressed: ()
                 {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Stokekle()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Contact()));
                 }
             )
             ,

@@ -1,32 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:teknolojirenault/main.dart';
-const TextStyle _textStyle = TextStyle(
-  fontSize: 40,
-  fontWeight: FontWeight.bold,
-  letterSpacing: 2,
-  fontStyle: FontStyle.italic,
-);
-class Stokkontrol extends StatefulWidget{
-  const Stokkontrol ({Key? key}) : super (key: key);
-  @override
-  _StokkontrolState createState() => _StokkontrolState();
-}
-
-class _StokkontrolState extends State<Stokkontrol> {
-  @override
-  Widget build(BuildContext context) {
-    return  MaterialApp(
-      // Remove the debug banner
-      debugShowCheckedModeBanner: false,
-      title: 'Stok Kontrol',
-      home: HomePage(),
-      theme: ThemeData(
-        primarySwatch: Colors.amber,
-      ),
-    );
-  }
-}
+import 'package:teknolojirenault/models/products.dart';
+import 'package:teknolojirenault/helper/dbHelper.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -34,141 +8,153 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentIndex = 0;
-  List<Widget> pages = const [
-  Text('eco', style: _textStyle),
-      Text('home', style: _textStyle),
-  Text('person', style: _textStyle),
-  Text('video', style: _textStyle),];
-  final List<Map<String, dynamic>> _allUsers = [
-    {"id": 1, "name": "Kış Lastiği", "age": 29},
-    {"id": 2, "name": "Hava Filtresi", "age": 40},
-    {"id": 3, "name": "Polen Filtresi", "age": 5},
-    {"id": 4, "name": "Dört Mevsim Lastik", "age": 35},
-    {"id": 5, "name": "Fren Hidroliği", "age": 21},
-    {"id": 6, "name": "Cam Suyu", "age": 55},
-    {"id": 7, "name": "Ön Balata", "age": 30},
-    {"id": 8, "name": "Arka Balata", "age": 14},
-    {"id": 9, "name": "Motor Yağı", "age": 100},
-    {"id": 10, "name": "Yaz Lastiği", "age": 32},
-  ];
+  DatabaseHelper _databaseHelper = DatabaseHelper();
+  List<Products> allProducts = [];
+  bool aktiflik = false;
+  var _controllerTitle = TextEditingController();
+  var _controllerDesc = TextEditingController();
+  var _formKey = GlobalKey<FormState>();
+  late int clickedNoteID;
 
-  List<Map<String, dynamic>> _foundUsers = [];
-  @override
-  initState() {
-    _foundUsers = _allUsers;
-    super.initState();
+  void getProducts() async {
+    var ProductsFuture = _databaseHelper.getAllProducts();
+    await ProductsFuture.then((data) {
+      setState(() {
+        this.allProducts = data;
+      });
+    });
   }
 
-  void _runFilter(String enteredKeyword) {
-    List<Map<String, dynamic>> results = [];
-    if (enteredKeyword.isEmpty) {
-      results = _allUsers;
-    } else {
-      results = _allUsers
-          .where((user) =>
-          user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
-    }
-
-    setState(() {
-      _foundUsers = results;
-    });
+  @override
+  void initState() {
+    super.initState();
+    getProducts();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => MyHomePage(title: 'Anasayfa')));
-          },
-          icon: Icon(Icons.arrow_back),
+        appBar: AppBar(
+          title: Text("Stok Kontrol"),
         ),
-        title: Text("Stok Kontrol"),
-      ),
+        body: Container(
+            child: Column(children: <Widget>[
+              Form(
+                  key: _formKey,
+                  child: Column(children: <Widget>[
+                    buildForm(_controllerTitle, "Ürün Adı"),
+                    buildForm(_controllerDesc, "Adet")
+                  ])),
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    buildButton("Kaydet", Colors.green, saveObject),
+                    buildButton("Güncelle", Colors.yellow, updateObject)
+                  ]),
+              Expanded(
+                  child: ListView.builder(
+                      itemCount: allProducts.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                            child: ListTile(
+                                onTap: () {
+                                  setState(() {
+                                    _controllerTitle.text = allProducts[index].title!;
+                                    _controllerDesc.text =
+                                    allProducts[index].description!;
+                                    clickedNoteID = allProducts[index].id!;
+                                  });
+                                },
+                                title: Text(allProducts[index].title!),
+                                subtitle: Text(allProducts[index].description!),
+                                trailing: GestureDetector(
+                                  onTap: () {
+                                    _deleteNote(allProducts[index].id!, index);
+                                  },
+                                  child: Icon(Icons.delete),
+                                )));
+                      }))
+            ])));
+  }
 
-      body: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            TextField(
-              onChanged: (value) => _runFilter(value),
-              decoration: const InputDecoration(
-                  labelText: 'Ürün Ara', suffixIcon: Icon(Icons.search)),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            Expanded(
-              child:
-              _foundUsers.isNotEmpty
-                  ? ListView.builder(
-                itemCount: _foundUsers.length,
-                itemBuilder: (context, index) => Card(
-                  key: ValueKey(_foundUsers[index]["id"]),
-                  color: Colors.amberAccent,
-                  elevation: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  child: ListTile(
-                    leading: Text(
-                      _foundUsers[index]["id"].toString(),
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    title: Text(_foundUsers[index]['name']),
-                    subtitle: Text(
-                        '${_foundUsers[index]["age"].toString()} tane kaldı.'),
-                  ),
-                ),
-              )
-                  : const Text(
-                'Sonuç Bulunamadı',
-                style: TextStyle(fontSize: 24),
-              ),
-            ),
-          ],
-        ),
-      ),
+  Widget buildForm(TextEditingController txtController, String str) {
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextFormField(
+            autofocus: false,
+            controller: txtController,
+            decoration:
+            InputDecoration(labelText: str, border: OutlineInputBorder())));
+  }
 
-     /* bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (int newIndex) {
-          setState(() {
-            _currentIndex = newIndex;
-          });
-        },
-        destinations: const [
-          NavigationDestination(
-            selectedIcon: Icon(Icons.eco),
-            icon: Icon(Icons.eco_outlined),
-            label: 'eco',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home),
-            icon: Icon(Icons.home_outlined),
-            label: 'home',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.person),
-            icon: Icon(Icons.person_outlined),
-            label: 'person',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.video_camera_back),
-            icon: Icon(Icons.video_camera_back_outlined),
-            label: 'video',
-          ),
-        ],
-      ),*/
-
-
+  Widget buildButton(String str, Color buttonColor, Function eventFunc) {
+    return RaisedButton(
+      child: Text(str),
+      color: buttonColor,
+      onPressed: () {
+        eventFunc();
+      },
     );
   }
-}
 
+  void updateObject() {
+    if (clickedNoteID != null) {
+      if (_formKey.currentState!.validate()) {
+        _uptadeNote(Products.withID(
+            clickedNoteID, _controllerTitle.text, _controllerDesc.text));
+      }
+    } else {
+      alert();
+    }
+  }
+
+  void saveObject() {
+    if (_formKey.currentState!.validate()) {
+      _addNote(Products(_controllerTitle.text, _controllerDesc.text));
+    }
+  }
+
+  void alert() {
+    AlertDialog alert = AlertDialog(
+      title: Text("SEÇİLİ ÜRÜN YOK!"),
+      content: Text("Lütfen bir ürün seçerek güncelleme işlemi yapınız!"),
+    );
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  //Crud İşlemlerinin AraYüze Uygulanması
+
+  void _addNote(Products note) async {
+    await _databaseHelper.insert(note);
+
+    setState(() {
+      getProducts();
+      _controllerTitle.text = "";
+      _controllerDesc.text = "";
+    });
+  }
+
+  void _uptadeNote(Products note) async {
+    await _databaseHelper.update(note);
+
+    setState(() {
+      getProducts();
+      _controllerTitle.text = "";
+      _controllerDesc.text = "";
+      clickedNoteID = null as int;
+    });
+  }
+
+  void _deleteNote(int deletedNoteId, int deletedNoteIndex) async {
+    await _databaseHelper.delete(deletedNoteId);
+
+    setState(() {
+      getProducts();
+    });
+  }
+}
